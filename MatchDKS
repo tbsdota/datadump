@@ -1,150 +1,135 @@
-;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;
-;	;	;	;	;	;	;	VARIABLES	;	;	;	;	;	;	;	;
-;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;
-vMagicChest = 
-vMagicHead = 
-vMagicLeg = 
-vMagicHand = 
-vFireChest = 
-vFireHead = 
-vFireLeg = 
-vFireHand = 
-vLightChest = 
-vLightHead = 
-vLightLeg = 
-vLightHand =
-vDarkChest = 
-vDarkHead = 
-vDarkLeg = 
-vDarkHand = 
-
-vLine = 
-vLine1 = 
-vLine2 = 
-vLine3 = 
-vLine4 = 
-vLineLength = 
-vLine2 = 
-vLineChar =
-vLineP1 = 0
-vLineP2 = 0
-vLineP3 = 0
-vLineP4 = 0
-vSetP1 = 0
-vSetP2 = 0
-vSetP3 = 0
-
-vSetChest = 0
-vSetHead = 0
-vSetHand = 0
-vSetLeg = 0
-vSet = 1|1|1|1
-vToggle = firstrun
-vSet3 = 
-vSetCheck = 
-vSetLength = 
-vSetChar = 
-vLines1 =
-vLines2 =
-vLines3 =
-vLines4 =
-vMatches = 0
-vMisses = 0
-vMiss = 
-vAll = 1
-vX = 0
-vTimeString =
+v_number_of_files =
+v_temp_string = 
+v_temp_count_Loop := 0
+v_temp_int := 0
+v_percent_gui := 0
+v_binary_check_1 = no
+v_binary_check_2 = no
+v_binary_check_3 = no
+v_binary_check_4 = yes
+vMisses := 0
+vMatches := 0
+v_binary_string = 1|1|1|1
+v_percent_gui := 0
 
 
-;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;
-;	;	;	;	;	;	;	READ	FILES	;	;	;	;	;	;	;
-;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;
-
-Loop, Read, files/Chest.txt
-   vLines1 = %A_Index%
-   vLines1 = %A_Index%
-
-Loop, Read, files/Head.txt
-   vLines2 = %A_Index%
-   
-Loop, Read, files/Hand.txt
-   vLines3 = %A_Index%
-
-Loop, Read, files/Leg.txt
-	vLines4 = %A_Index%
-
-FileReadLine, vPerc2, data/backup.txt, 2
-	
+Loop %A_WorkingDir%\files\*.*
+{	
+	Array%A_Index% := A_LoopFileName
+	v_temp_count_Loop += 1
+	v_temp_string := Array%v_temp_count_Loop%
+	v_filename_%A_Index% := A_LoopFileName
+	Loop, Read, files/%v_temp_string%
+		v_temp_int = %A_Index%
+	v_file_%v_temp_count_Loop% = %v_temp_int%
+}
+v_number_of_files := v_temp_count_Loop
+v_temp_count_Loop := 0
+v_temp_string = ""
+FileRead, v_temp_string, data/backup.txt
+	if Errorlevel = 1
+		msgbox, no file
+		
 Loop, Read, data/backup.txt
-	vX = %A_Index%
-	
-if (vX >= 1)
+	v_temp_int = %A_Index%
+msgbox, %v_temp_int%
+if (v_temp_int >= 1)
 {
-	FileReadLine, vX, data/backup.txt, 1
 	Gui, Add, Button, gs0 w2 h2 x-30 y-40, e
 	Gui, Font, s12 norm
-	Gui, Add, Text, text2 x10 y10 ReadOnly Lowercase Left,Found a backup that wasn't completed.`nDo you want to continue the last load?`n`n%vX%
-	Gui, Add, Button, gsx1 w80 h44 x30 y120 vBYes, Yes
-	Gui, Add, Button, gsx2 w80 h44 x180 y120 vBNo, No
+	Gui, Add, Text, text2 x10 y10 ReadOnly Lowercase Left,Found a backup that wasn't completed.`nDo you want to continue the last load?`n`n%v_temp_int%
+	Gui, Add, Button, gb_Yes_load w80 h44 x30 y120, Yes
+	Gui, Add, Button, gb_no_load w80 h44 x180 y120, No
 	Gui, Show, w300 h190, Backup Found
+	v_total_combo := v_file_1
+	loop, %v_number_of_files%
+	if A_Index != 1
+		v_total_combo := v_file_%A_Index% * v_total_combo
+	v_temp_int := v_file_1
+	loop, %v_number_of_files%
+		if A_Index != 1
+			v_temp_int := v_file_%A_Index% + v_temp_int
+	v_tally_combos_commas := RegExReplace(v_temp_int, "(\d)(?=(?:\d{3})+(?:\.|$))", "$1,")
+	v_total_combo_commas := RegExReplace(v_total_combo, "(\d)(?=(?:\d{3})+(?:\.|$))", "$1,")
+
+	v_box5_header = [%v_file_1%]
+	loop, %v_number_of_files%
+		if A_Index != 1
+			{
+				v_temp_string := v_file_%A_Index%
+				v_box5_header = %v_box5_header% [%v_temp_string%]
+			}
+	v_temp_string = ""
+	v_box5_header = %v_box5_header% - [%v_tally_combos_commas% total items] [%v_total_combo_commas% total combinations]`n
+	GuiControl, , box5, %v_box5_3x%
+	GuiControl, , Button, working
+	GuiControl, disable, Button
+}	
+else
+{
+
 }
-
-;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;
-;	;	;	;	;	;	;	GUI WINDOW	;	;	;	;	;	;	;	;
-;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;
-
+		
 s0:
-;	;	DUMMY BUTTON
 return
 
-sx1:
-;	;	 LOADING WITH BACKUP
+b_yes_load:
 Gui, Destroy
 vToggle = ignore
-vSet = %vX%
+FileReadLine, v_binary_string, data/backup.txt, 1
+Loop, Parse, v_binary_string, `,|
+	v_binary_%A_Index% := A_LoopField
+v_binary_norm := 1 + (((v_binary_1 - 1) * v_file_2 * v_file_3 * v_file_4) + ((v_binary_2 - 1) * v_file_3 * v_file_4) + ((v_binary_3 - 1) * v_file_4) + (v_binary_4 - 1))
+v_percent_gui := Round((v_binary_norm / v_total_combo)100,3)
+GuiControl, , Write, %v_percent_gui%`%
+
 Gui, Font, s24 norm
 Gui, Add, Button, gs0 w2 h2 x-30 y-40, e
 Gui, Add, Edit, text1 w2 h10 x-100 y-100 ReadOnly Lowercase, e
-Gui, Add, Edit, text5 w365 h44 x10 y25 ReadOnly Lowercase Right vAllOf, 0 Checked
-Gui, Add, Edit, text2 w200 h44 x390 y25 ReadOnly Lowercase Right vWrite, 0.000`%
+Gui, Add, Edit, text5 w365 h44 x10 y25 ReadOnly Lowercase Right vGuiCheck, 0 Checked
+Gui, Add, Edit, text2 w200 h44 x390 y25 ReadOnly Lowercase Right vGuiPercent, 0.000`%
 Gui, Font, s18 norm
-Gui, Add, Edit, text2 w260 h38 x10 y90 ReadOnly Lowercase Right vMissIT, 0 miss
-Gui, Add, Edit, text3 w210 h38 x285 y90 ReadOnly Lowercase Right vCheckIT, 0 Match
+Gui, Add, Edit, text2 w260 h38 x10 y90 ReadOnly Lowercase Right vGuiMiss, 0 miss
+Gui, Add, Edit, text3 w210 h38 x285 y90 ReadOnly Lowercase Right vGuiMatch, 0 Match
 Gui, Font, s24 norm
 Gui, Font, s7 norm
-Gui, Add, Edit, text4 w580 h320 x10 y160 ReadOnly Lowercase Left vListIT, 
+Gui, Add, Edit, text4 w580 h320 x10 y160 ReadOnly Lowercase Left vbox5, %v_box5_header%
 Gui, Font, s16 norm
 Gui, Add, Button, gs1 w80 h44 x510 y90 vButton, Begin
 Gui, Font, s24 norm
 Gui, Show, w600 h500, Finding Best Matches
 return
 
-sx2:
-	;	;	DENIED PREVIOUS LOAD. LOADING FRESH, ARCHIVING BACKUP
+b_no_load:
 Gui, Destroy
 FileCopy, %A_WorkingDir%/data/backup.txt, %A_WorkingDir%/archive
-FormatTime, vTimeString, , ddhhmmss
-FileMove, %A_WorkingDir%/archive/backup.txt, %A_WorkingDir%/archive/%vTimeString% backup.txt
-
+FormatTime, v_temp_string, , ddhhmmss
+FileMove, %A_WorkingDir%/archive/backup.txt, %A_WorkingDir%/archive/%v_temp_string% backup.txt
 FileCopy, %A_WorkingDir%/data/draft.txt, %A_WorkingDir%/archive
-FormatTime, vTimeString, , ddhhmmss
-FileMove, %A_WorkingDir%/archive/draft.txt, %A_WorkingDir%/archive/%vTimeString% draft.txt
+FormatTime, v_temp_string, , ddhhmmss
+FileMove, %A_WorkingDir%/archive/draft.txt, %A_WorkingDir%/archive/%v_temp_string% draft.txt
 
-FileDelete, data/draft.txt
-FileDelete, data/backup.txt
-FileAppend, %vSet%`n%vPerc2%, data/backup.txt
+loop, %v_number_of_files%
+{
+	if A_Index = %v_number_of_files%
+		v_binary_string = %v_binary_string%1
+	else
+		v_binary_string = %v_binary_string%1|
+}
+Loop, Parse, v_binary_string, `,|
+	v_binary_%A_Index% := A_LoopField
 
 Gui, Font, s24 norm
 Gui, Add, Button, gs0 w2 h2 x-30 y-40, e
 Gui, Add, Edit, text1 w2 h10 x-100 y-100 ReadOnly Lowercase, e
-Gui, Add, Edit, text5 w365 h44 x10 y25 ReadOnly Lowercase Right vAllOf, 0 Checked
-Gui, Add, Edit, text2 w200 h44 x390 y25 ReadOnly Lowercase Right vWrite, 0.000`%
+Gui, Add, Edit, text5 w365 h44 x10 y25 ReadOnly Lowercase Right vGuiCheck, 0 Checked
+Gui, Add, Edit, text2 w200 h44 x390 y25 ReadOnly Lowercase Right vGuiPercent, 0.000`%
 Gui, Font, s18 norm
-Gui, Add, Edit, text2 w260 h38 x10 y90 ReadOnly Lowercase Right vMissIT, 0 miss
-Gui, Add, Edit, text3 w210 h38 x285 y90 ReadOnly Lowercase Right vCheckIT, 0 Match
+Gui, Add, Edit, text2 w260 h38 x10 y90 ReadOnly Lowercase Right vGuiMiss, 0 miss
+Gui, Add, Edit, text3 w210 h38 x285 y90 ReadOnly Lowercase Right vGuiMatch, 0 Match
 Gui, Font, s24 norm
 Gui, Font, s7 norm
-Gui, Add, Edit, text4 w580 h320 x10 y160 ReadOnly Lowercase Left vListIT, 
+Gui, Add, Edit, text4 w580 h320 x10 y160 ReadOnly Lowercase Left vbox5, %v_box5_header%
 Gui, Font, s16 norm
 Gui, Add, Button, gs1 w80 h44 x510 y90 vButton, Begin
 Gui, Font, s24 norm
@@ -152,537 +137,190 @@ Gui, Show, w600 h500, Finding Best Matches
 return
 
 
-;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;
-;	;	;	;	;	;	;	BEGIN WORK	;	;	;	;	;	;	;	;
-;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;
 
 s1:
-	;	;	 CALCULATING %
-vPerc = 0
-vPercP := (vLines1 * vLines2 * vLines3 * vLines4)
-vPerc22 := RegExReplace(vPercP, "(\d)(?=(?:\d{3})+(?:\.|$))", "$1,")
-vPerc2 := vPercP
-	;	;	 WRITING TOTALS in BOTTOM BOX ON FIRST LINE
-vT1 := vLines1 + vLines2 + vLines3 + vLines4
-vT1 := RegExReplace(vT1, "(\d)(?=(?:\d{3})+(?:\.|$))", "$1,")
-vListIT2 = [%vLines1% Chests] [%vLines2% Helms] [%vLines3% Hands] [%vLines4% Legs] - [%vT1% total items] [%vPerc22% total combinations]`n
-vListIT3x = %vListIT3%%vListIT2%
-GuiControl, , ListIT, %vListIT3x%
+
+v_box5_3x = %v_box5_3%%v_box5_2%
+GuiControl, , box5, %v_box5_3x%
 GuiControl, , Button, working
 GuiControl, disable, Button
 
 
-	;	;	PERCENT DONE CONVERSION -1
 Loop
 {
+	v_percent_gui := Round(((A_Index / v_total_combo)*100),3)
+		if v_percent_gui > 100.000
+			v_percent_gui := 100.000
+	GuiControl, , GuiPercent, %v_percent_gui%`%
+	
+	v_loop_count := A_Index - 1
 
-	vPerc2 := vPerc2 - 1
-	vPerc := Round(((A_Index / vPercP) * 100), 3)
-	if vPerc > 100
-	{
-		vPerc := 100.000
-	}
-	GuiControl, , Write, %vPerc%`%
+	if v_loop_count < 9999
+		v_short_checked := A_Index
+	if (v_loop_count >9999) and (v_loop_count <1000000)
+		v_symbol = K
+	else if (v_loop_count >999999) and (v_loop_count <1000000000)
+		v_symbol = M
+	else if (v_loop_count >999999) and (v_loop_count <1000000000)
+		v_symbol = B
+	GuiControl, , GuiCheck, %v_loop_count%%v_symbol% Checked
+
 	
-		;	;	CHECKED MARKS, ROUNDING
-	vAll := A_Index - 1
+
 	
-	if (vAll > 10000) and (vAll <100000)
+	if A_Index = 1
 	{
-	StringMid, vAll1, vAll, 1, 2
-	StringMid, vAll2, vAll, 3, 2
-	GuiControl, , AllOf, %vAll1%.%vAll2%K Checked
-	}
-	else if (vAll > 100000) and (vAll <1000000)
-	{
-	StringMid, vAll1, vAll, 1, 3
-	StringMid, vAll2, vAll, 4, 2
-	GuiControl, , AllOf, %vAll1%.%vAll2%K Checked
-	}
-	else if (vAll > 1000000) and (vAll <10000000)
-	{
-	StringMid, vAll1, vAll, 1, 1
-	StringMid, vAll2, vAll, 2, 4
-	GuiControl, , AllOf, %vAll1%.%vAll2%M Checked
-	}
-	else if (vAll > 10000000) and (vAll <100000000)
-	{
-	StringMid, vAll1, vAll, 1, 2
-	StringMid, vAll2, vAll, 3, 4
-	GuiControl, , AllOf, %vAll1%.%vAll2%M Checked
-	}
-	else if (vAll > 100000000) and (vAll <1000000000)
-	{
-	StringMid, vAll1, vAll, 1, 3
-	StringMid, vAll2, vAll, 4, 4
-	GuiControl, , AllOf, %vAll1%.%vAll2%M Checked
-	}
-	else if (vAll > 100000000)
-	{
-	StringMid, vAll1, vAll, 1, 1
-	StringMid, vAll2, vAll, 2, 5
-	GuiControl, , AllOf, %vAll1%.%vAll2%B Checked
+	; first run through
 	}
 	else
 	{
-	GuiControl, , AllOf, %vAll% Checked
-	}
-	
-		;	;	CREATE A vSET FROM FILES PER LINE. INGORES FIRST RUN AND INGORES FIRST RUN AFTER LOADING PREVIOUS
-	if (vToggle = "firstrun")
-	{	
-		vSetChest = 1
-		vSetHead = 1
-		vSetHand = 1
-		vSetLeg = 1
-		vToggle = go
-	}
-	else if (vToggle != "firstrun")
-	{
-		StringLen, vSetLength, vSet
-		Loop, %vSetLength%
+		v_temp_int := 0
+		v_yes := 1
+		v_loop_count += 1
+		Loop
 		{
-			StringMid, vSetChar, vSet, %A_Index%, 1
-			if vSetChar = |
+			if v_yes = 1
+				v_temp_int := v_number_of_files - A_Index + 1
+					if v_temp_int < 1
+						msgbox, error
+			v_yes := 0
+			if (v_binary_%v_temp_int% != v_file_%v_temp_int%)
 			{
-				if (vSetP1 = 0) and (vSetP2 = 0) and (vSetP3 = 0)
+				v_binary_%v_temp_int% += 1
+				break
+			}
+			else
+			{
+				if (v_Loop_count <= v_total_combo)
 				{
-					vSetP1 = %A_Index%
-				}
-				else if (vSetP1 != 0) and (vSetP2 = 0) and (vSetP3 = 0)
-				{
-					vSetP2 = %A_Index%
-				}
-				else if (vSetP1 != 0) and (vSetP2 != 0) and (vSetP3 = 0)
-				{
-					vSetP3 = %A_Index%
+					v_binary_%v_temp_int% := 1
+					v_yes := 1
 				}
 				else
 				{
-				exit loop
+				v_box5_2 = %v_box5_2%`nData Complete`n
+				v_box5_3 = %v_box5_3%%v_box5_2%
+				GuiControl, , box5, %v_box5_3%
+				GuiControl, hide, Button
+				Gui, Font, s16 norm
+				Gui, Add, Button, gs2 w80 h44 x510 y90, Open
+				Gui, Font, s24 norm
+				;FileDelete, data/backup.txt
+				FileAppend, %vSet%`n%vAll%, data/backup.txt
+				FileCopy, %A_WorkingDir%/data/backup.txt, %A_WorkingDir%/archive
+				FormatTime, v_temp_string, , ddhhmmss
+				FileMove, %A_WorkingDir%/archive/backup.txt, %A_WorkingDir%/archive/%v_temp_string% backup [Completed].txt
+				FileCopy, %A_WorkingDir%/data/draft.txt, %A_WorkingDir%/archive
+				FormatTime, v_temp_string, , ddhhmmss
+				FileMove, %A_WorkingDir%/archive/draft.txt, %A_WorkingDir%/archive/%v_temp_string% draft [Completed].txt
+				v_done = "yes"
+				break
 				}
 			}
 		}
-		StringMid, vSetChest, vSet, 1, (vSetP1 - 1)
-		StringMid, vSetHead, vSet, (vSetP1 + 1), (vSetP2 - (vSetP1 + 1))
-		StringMid, vSetHand, vSet, (vSetP2 + 1), (vSetP3 - (vSetP2 + 1))
-		StringMid, vSetLeg, vSet, (vSetP3 + 1), vSetLength
-		vSetP1 = 0
-		vSetP2 = 0
-		vSetP3 = 0
-		vSetP4 = 0
-		vSetLength = 
-		vSetChar = 	
-		
-		
-		;	;	;	;	;	;	;	;	;	;	;	;	;	;	SWITCH BOARD	;	;	;	;	;	;	;	;	;	;	;	;	;
-		
-		if (vToggle = "ignore") or (vToggle = "firstrun")
-		{
-		vToggle = go
-		}
-		else if (vToggle != "ignore") and (vToggle != "firstrun")
-		{
-			if (vSetLeg != vLines4)
-			{
-				vSetLeg := vSetLeg + 1
-			}
-			else if (vSetLeg = vLines4)
-			{
-				vSetLeg := 1
-				if (vSetHand != vLines3)
-				{
-					vSetHand := vSetHand + 1
-				}
-				else if (vSetHand = vLines3)
-				{
-					vSetHand := 1
-					if (vSetHead != vLines2)
-					{
-						vSetHead := vSetHead + 1
-					}
-					else if (vSetHead = vLines2)
-					{
-						vSetHead := 1
-						if (vSetChest != vLines1)
-						{
-							vSetChest := vSetChest + 1
-						}
-						else if (vSetChest = vLines1)
-						{
-							vListIT2 = Data Complete`n
-							vListIT3 = %vListIT3%%vListIT2%
-							GuiControl, , ListIT, %vListIT3%
-							GuiControl, hide, Button
-							Gui, Font, s16 norm
-							Gui, Add, Button, gs2 w80 h44 x510 y90 vButton2, Open
-							Gui, Font, s24 norm
-							vToggle = ignore
-							FileDelete, data/backup.txt
-							FileAppend, %vSet%`n%vAll%, data/backup.txt
-							FileCopy, %A_WorkingDir%/data/backup.txt, %A_WorkingDir%/archive
-							FormatTime, vTimeString, , ddhhmmss
-							FileMove, %A_WorkingDir%/archive/backup.txt, %A_WorkingDir%/archive/%vTimeString% backup [Completed].txt
-
-							FileCopy, %A_WorkingDir%/data/draft.txt, %A_WorkingDir%/archive
-							FormatTime, vTimeString, , ddhhmmss
-							FileMove, %A_WorkingDir%/archive/draft.txt, %A_WorkingDir%/archive/%vTimeString% draft [Completed].txt
-							exit loop
-						}
-						else
-						{
-							vListIT2 = - - Chest exceeded Limit!`n
-							vListIT3 = %vListIT3%%vListIT2%
-							GuiControl, , ListIT, %vListIT3%	
-							exit loop
-						}
-					}
-					else
-					{
-						vListIT2 = - - Head exceeded Limit!`n
-						vListIT3 = %vListIT3%%vListIT2%
-						GuiControl, , ListIT, %vListIT3%	
-						exit loop
-					}
-				}
-				else
-				{
-					vListIT2 = - - Hand exceeded Limit!`n
-					vListIT3 = %vListIT3%%vListIT2%
-					GuiControl, , ListIT, %vListIT3%	
-					exit loop
-				}
-			}
-			else
-			{
-				vListIT2 = - - Leg exceeded Limit!`n
-				vListIT3 = %vListIT3%%vListIT2%
-				GuiControl, , ListIT, %vListIT3%	
-				exit loop
-			}
-		}
+		if v_done = "yes"
+			break
 	}
-	vSet = %vSetChest%|%vSetHead%|%vSetHand%|%vSetLeg%
 	
 	
-		;	;	;	;	;	CHEST - CONVERT REISTANCE INTO INTERERS FROM FILE
-	FileReadLine, vLine1, files/Chest.txt, vSetChest
-	StringLen, vLineLength, vLine1
-	Loop, %vLineLength%
+	loop, %v_number_of_files%
 	{
-		StringMid, vLineChar, vLine1, %A_Index%, 1
-		if vLineChar = |
+		if A_Index != 1
 		{
-			if (vLineP1 = 0) and (vLineP2 = 0) and (vLineP3 = 0) and (vLineP4 = 0)
-			{
-				vLineP1 = %A_Index%
-			}
-			else if (vLineP1 != 0) and (vLineP2 = 0) and (vLineP3 = 0) and (vLineP4 = 0)
-			{
-				vLineP2 = %A_Index%
-			}
-			else if (vLineP1 != 0) and (vLineP2 != 0) and (vLineP3 = 0) and (vLineP4 = 0)
-			{
-				vLineP3 = %A_Index%
-			}
-			else if (vLineP1 != 0) and (vLineP2 != 0) and (vLineP3 != 0) and (vLineP4 = 0)
-			{
-				vLineP4 = %A_Index%
-			}
-			else
-			{
-			exit loop
-			}
-		}
-	}
-	StringMid, vMagicChest, vLine1, (vLineP1 + 1), (vLineP2 - (vLineP1 + 1))
-	StringMid, vFireChest, vLine1, (vLineP2 + 1), (vLineP3 - (vLineP2 + 1))
-	StringMid, vLightChest, vLine1, (vLineP3 + 1), (vLineP4 - (vLineP3 + 1))
-	StringMid, vDarkChest, vLine1, (vLineP4 + 1), (vLineLength - (vLineP4 ))
-	StringMid, vLine1, vLine1, 1, (vLineP1 - 1)
-	vLineP1 = 0
-	vLineP2 = 0
-	vLineP3 = 0
-	vLineP4 = 0
-	vLineLength = 
-	vLineChar = 
-	
-		;	;	;	;	;	HEAD - CONVERT REISTANCE INTO INTERERS FROM FILE
-	FileReadLine, vLine2, files/Head.txt, vSetHead
-	StringLen, vLineLength, vLine2
-	Loop, %vLineLength%
-	{
-		StringMid, vLineChar, vLine2, %A_Index%, 1
-		if vLineChar = |
-		{
-			if (vLineP1 = 0) and (vLineP2 = 0) and (vLineP3 = 0) and (vLineP4 = 0)
-			{
-				vLineP1 = %A_Index%
-			}
-			else if (vLineP1 != 0) and (vLineP2 = 0) and (vLineP3 = 0) and (vLineP4 = 0)
-			{
-				vLineP2 = %A_Index%
-			}
-			else if (vLineP1 != 0) and (vLineP2 != 0) and (vLineP3 = 0) and (vLineP4 = 0)
-			{
-				vLineP3 = %A_Index%
-			}
-			else if (vLineP1 != 0) and (vLineP2 != 0) and (vLineP3 != 0) and (vLineP4 = 0)
-			{
-				vLineP4 = %A_Index%
-			}
-			else
-			{
-			exit loop
-			}
-		}
-	}
-	StringMid, vMagicHead, vLine2, (vLineP1 + 1), (vLineP2 - (vLineP1 + 1))
-	StringMid, vFireHead, vLine2, (vLineP2 + 1), (vLineP3 - (vLineP2 + 1))
-	StringMid, vLightHead, vLine2, (vLineP3 + 1), (vLineP4 - (vLineP3 + 1))
-	StringMid, vDarkHead, vLine2, (vLineP4 + 1), (vLineLength - (vLineP4 ))
-	StringMid, vLine2, vLine2, 1, (vLineP1 - 1)
-	vLineP1 = 0
-	vLineP2 = 0
-	vLineP3 = 0
-	vLineP4 = 0
-	vLineLength = 
-	vLineChar = 
-	
-		;	;	;	;	;	HAND - CONVERT REISTANCE INTO INTERERS FROM FILE
-	FileReadLine, vLine3, files/Hand.txt, vSetHand
-	StringLen, vLineLength, vLine3
-	Loop, %vLineLength%
-	{
-		StringMid, vLineChar, vLine3, %A_Index%, 1
-		if vLineChar = |
-		{
-			if (vLineP1 = 0) and (vLineP2 = 0) and (vLineP3 = 0) and (vLineP4 = 0)
-			{
-				vLineP1 = %A_Index%
-			}
-			else if (vLineP1 != 0) and (vLineP2 = 0) and (vLineP3 = 0) and (vLineP4 = 0)
-			{
-				vLineP2 = %A_Index%
-			}
-			else if (vLineP1 != 0) and (vLineP2 != 0) and (vLineP3 = 0) and (vLineP4 = 0)
-			{
-				vLineP3 = %A_Index%
-			}
-			else if (vLineP1 != 0) and (vLineP2 != 0) and (vLineP3 != 0) and (vLineP4 = 0)
-			{
-				vLineP4 = %A_Index%
-			}
-			else
-			{
-			exit loop
-			}
-		}
-	}
-	StringMid, vMagicHand, vLine3, (vLineP1 + 1), (vLineP2 - (vLineP1 + 1))
-	StringMid, vFireHand, vLine3, (vLineP2 + 1), (vLineP3 - (vLineP2 + 1))
-	StringMid, vLightHand, vLine3, (vLineP3 + 1), (vLineP4 - (vLineP3 + 1))
-	StringMid, vDarkHand, vLine3, (vLineP4 + 1), (vLineLength - (vLineP4 ))
-	StringMid, vLine3, vLine3, 1, (vLineP1 - 1)
-	vLineP1 = 0
-	vLineP2 = 0
-	vLineP3 = 0
-	vLineP4 = 0
-	vLineLength = 
-	vLineChar = 
-
-	;	;	;	;	;	LEG - CONVERT REISTANCE INTO INTERERS FROM FILE
-	FileReadLine, vLine4, files/Leg.txt, vSetLeg
-	StringLen, vLineLength, vLine4
-	Loop, %vLineLength%
-	{
-		StringMid, vLineChar, vLine4, %A_Index%, 1
-		if vLineChar = |
-		{
-			if (vLineP1 = 0) and (vLineP2 = 0) and (vLineP3 = 0) and (vLineP4 = 0)
-			{
-				vLineP1 = %A_Index%
-			}
-			else if (vLineP1 != 0) and (vLineP2 = 0) and (vLineP3 = 0) and (vLineP4 = 0)
-			{
-				vLineP2 = %A_Index%
-			}
-			else if (vLineP1 != 0) and (vLineP2 != 0) and (vLineP3 = 0) and (vLineP4 = 0)
-			{
-				vLineP3 = %A_Index%
-			}
-			else if (vLineP1 != 0) and (vLineP2 != 0) and (vLineP3 != 0) and (vLineP4 = 0)
-			{
-				vLineP4 = %A_Index%
-			}
-			else
-			{
-			exit loop
-			}
-		}
-	}
-	StringMid, vMagicLeg, vLine4, (vLineP1 + 1), (vLineP2 - (vLineP1 + 1))
-	StringMid, vFireLeg, vLine4, (vLineP2 + 1), (vLineP3 - (vLineP2 + 1))
-	StringMid, vLightLeg, vLine4, (vLineP3 + 1), (vLineP4 - (vLineP3 + 1))
-	StringMid, vDarkLeg, vLine4, (vLineP4 + 1), (vLineLength - (vLineP4 ))
-	StringMid, vLine4, vLine4, 1, (vLineP1 - 1)
-	vLineP1 = 0
-	vLineP2 = 0
-	vLineP3 = 0
-	vLineP4 = 0
-	vLineLength = 
-	vLineChar = 
-
-	;	;	;	;	;	CHECK FOR MATCHES
-	if (vMagicChest + vMagicHead + vMagicHand + vMagicLeg) > 209 and (vFireChest + vFireHead + vFireHand + vFireLeg) > 209 and (vLightChest + vLightHead + vLightHand + vLightLeg) > 209 and (vDarkChest + vDarkHead + vDarkHand + vDarkLeg) > 209
-	{
-		vMatches := (vMatches + 1)
-		;	;	;	;	;	SHOW MATCHES IN MATCH BOX, ROUND AND PLACE K,M,B MARKER
-		if (vMatches > 10000) and (vMatches <100000)
-		{
-		StringMid, vMatches1, vMatches, 1, 2
-		StringMid, vMatches2, vMatches, 3, 2
-		GuiControl, , CheckIT, %vMatches1%.%vMatches2%K match
-		}
-		else if (vMatches > 100000) and (vMatches <1000000)
-		{
-		StringMid, vMatches1, vMatches, 1, 3
-		StringMid, vMatches2, vMatches, 4, 2
-		GuiControl, , CheckIT, %vMatches1%.%vMatches2%K match
-		}
-		else if (vMatches > 1000000) and (vMatches <10000000)
-		{
-		StringMid, vMatches1, vMatches, 1, 1
-		StringMid, vMatches2, vMatches, 2, 4
-		GuiControl, , CheckIT, %vMatches1%.%vMatches2%M match
-		}
-		else if (vMatches > 10000000) and (vMatches <100000000)
-		{
-		StringMid, vMatches1, vMatches, 1, 2
-		StringMid, vMatches2, vMatches, 3, 4
-		GuiControl, , CheckIT, %vMatches1%.%vMatches2%M match
-		}
-		else if (vMatches > 100000000) and (vMatches <1000000000)
-		{
-		StringMid, vMatches1, vMatches, 1, 3
-		StringMid, vMatches2, vMatches, 4, 4
-		GuiControl, , CheckIT, %vMatches1%.%vMatches2%M match
-		}
-		else if (vMatches > 100000000)
-		{
-		StringMid, vMatches1, vMatches, 1, 1
-		StringMid, vMatches2, vMatches, 2, 5
-		GuiControl, , CheckIT, %vMatches1%.%vMatches2%B match
+			v_temp_string := v_binary_%A_Index%
+			v_binary_string = %v_binary_string%|%v_temp_string%
 		}
 		else
-		{
-		GuiControl, , CheckIT, %vMatches% match
-		}
+			v_binary_string := v_binary_1
+	}
+	
+	v_loop_count8 := 0
+	loop, %v_number_of_files%
+	{
+		v_loop_count8 += 1
+		v_temp_string := v_filename_%A_Index%
+		FileReadLine, v_temp_int, files/%v_temp_string%, v_binary_%A_Index%
+		StringGetPos, v_temp_int3, v_temp_int, |
+		StringLen, v_temp_int2, v_temp_int
+		StringMid, v_temp_string3, v_temp_int, (v_temp_int3 + 2), v_temp_int2
+		Loop, Parse, v_temp_string3, `,|
+			v_binary_value_%v_loop_count8%_%A_Index% := A_LoopField
+	}
+
+
+	if ((v_binary_value_1_1 + v_binary_value_2_1 + v_binary_value_2_1 + v_binary_value_2_1) > 209) and ((v_binary_value_1_2 + v_binary_value_2_2 + v_binary_value_3_2 + v_binary_value_4_2) > 209) and ((v_binary_value_1_3 + v_binary_value_2_3 + v_binary_value_2_3 + v_binary_value_2_3) > 209) and ((v_binary_value_1_4 + v_binary_value_2_4 + v_binary_value_2_4 + v_binary_value_2_4) > 209)
+	{
 		
-		;	;	;	;	;	SAVE DATA TO FILE
-		FileAppend, [%vMatches%] [%vSet%] %vLine1% + %vLine2% + %vLine3% + %vLine4%`n, data/draft.txt
-		
-		;	;	;	;	;	ADD DATA TO STRING INTERGER AND SHOW IN BOTTOM BOX
-		vListIT30 = %vListIT29%
-		vListIT29 = %vListIT28%
-		vListIT28 = %vListIT27%
-		vListIT27 = %vListIT26%
-		vListIT26 = %vListIT25%
-		vListIT25 = %vListIT24%
-		vListIT24 = %vListIT23%
-		vListIT23 = %vListIT22%
-		vListIT22 = %vListIT21%
-		vListIT21 = %vListIT20%
-		vListIT20 = %vListIT19%
-		vListIT19 = %vListIT18%
-		vListIT18 = %vListIT17%
-		vListIT17 = %vListIT16%
-		vListIT16 = %vListIT15%
-		vListIT15 = %vListIT14%
-		vListIT14 = %vListIT13%
-		vListIT13 = %vListIT12%
-		vListIT12 = %vListIT11%
-		vListIT11 = %vListIT10%
-		vListIT10 = [%vMatches%] %vLine1% + %vLine2% + %vLine3% + %vLine4%
-		GuiControl, , ListIT, %vListIT3x%`n%vListIT10%`n%vListIT11%`n%vListIT12%`n%vListIT13%`n%vListIT14%`n%vListIT15%`n%vListIT16%`n%vListIT17%`n%vListIT18%`n%vListIT19%`n%vListIT20%`n%vListIT21%`n%vListIT22%`n%vListIT23%`n%vListIT24%`n%vListIT25%`n%vListIT26%`n%vListIT27%`n%vListIT28%`n%vListIT29%`n%vListIT30%
+		vMatches := (vMatches + 1)	
+		if vMatches < 9999
+			vMatches_post = %vMatches%
+		if (vMatches >9999) and (vMatches <1000000)
+			vMatches_post = %vMatches%K
+		else if (vMatches >999999) and (vMatches <1000000000)
+			vMatches_post = %vMatches%M
+		else if (vMatches >999999) and (vMatches <1000000000)
+			vMatches_post = %vMatches%B
+		GuiControl, , GuiMatch, %vMatches_post% Matched
+
+		v_temp_String = %v_filename_1%
+		loop, %v_number_of_files%
+		if A_Index != 1
+			{
+				v_temp_string2 := v_filename_%A_Index%
+				v_temp_string = %v_temp_string% + %v_temp_string2%
+			}
+		FileAppend, [%vMatches%] [%v_binary_string%] %v_temp_string%`n, data/draft.txt
+		v_box5_30 = %v_box5_29%
+		v_box5_29 = %v_box5_28%
+		v_box5_28 = %v_box5_27%
+		v_box5_27 = %v_box5_26%
+		v_box5_26 = %v_box5_25%
+		v_box5_25 = %v_box5_24%
+		v_box5_24 = %v_box5_23%
+		v_box5_23 = %v_box5_22%
+		v_box5_22 = %v_box5_21%
+		v_box5_21 = %v_box5_20%
+		v_box5_20 = %v_box5_19%
+		v_box5_19 = %v_box5_18%
+		v_box5_18 = %v_box5_17%
+		v_box5_17 = %v_box5_16%
+		v_box5_16 = %v_box5_15%
+		v_box5_15 = %v_box5_14%
+		v_box5_14 = %v_box5_13%
+		v_box5_13 = %v_box5_12%
+		v_box5_12 = %v_box5_11%
+		v_box5_11 = %v_box5_10%
+		v_box5_10 = [%vMatches%] %v_temp_string%
+		GuiControl, , box5, %v_box5_3x%`n%v_box5_10%`n%v_box5_11%`n%v_box5_12%`n%v_box5_13%`n%v_box5_14%`n%v_box5_15%`n%v_box5_16%`n%v_box5_17%`n%v_box5_18%`n%v_box5_19%`n%v_box5_20%`n%v_box5_21%`n%v_box5_22%`n%v_box5_23%`n%v_box5_24%`n%v_box5_25%`n%v_box5_26%`n%v_box5_27%`n%v_box5_28%`n%v_box5_29%`n%v_box5_30%
 	}
 	else
 	{
-		;	;	;	;	;	CHECK FOR MISSES
-		vMisses := (vMisses + 1)
-		;	;	;	;	;	SHOW MISSES IN MISS BOX, ROUND AND PLACE K,M,B MARKER
-		if (vMisses > 10000) and (vMisses <100000)
-		{
-		StringMid, vMisses1, vMisses, 1, 2
-		StringMid, vMisses2, vMisses, 3, 2
-		GuiControl, , MissIT, %vMisses1%.%vMisses2%K miss
-		}
-		else if (vMisses > 100000) and (vMisses <1000000)
-		{
-		StringMid, vMisses1, vMisses, 1, 3
-		StringMid, vMisses2, vMisses, 4, 2
-		GuiControl, , MissIT, %vMisses1%.%vMisses2%K miss
-		}
-		else if (vMisses > 1000000) and (vMisses <10000000)
-		{
-		StringMid, vMisses1, vMisses, 1, 1
-		StringMid, vMisses2, vMisses, 2, 4
-		GuiControl, , MissIT, %vMisses1%.%vMisses2%M miss
-		}
-		else if (vMisses > 10000000) and (vMisses <100000000)
-		{
-		StringMid, vMisses1, vMisses, 1, 2
-		StringMid, vMisses2, vMisses, 3, 4
-		GuiControl, , MissIT, %vMisses1%.%vMisses2%M miss
-		}
-		else if (vMisses > 100000000) and (vMisses <1000000000)
-		{
-		StringMid, vMisses1, vMisses, 1, 3
-		StringMid, vMisses2, vMisses, 4, 4
-		GuiControl, , MissIT, %vMisses1%.%vMisses2%M miss
-		}
-		else if (vMisses > 100000000)
-		{
-		StringMid, vMisses1, vMisses, 1, 1
-		StringMid, vMisses2, vMisses, 2, 5
-		GuiControl, , MissIT, %vMisses1%.%vMisses2%B miss
-		}
-		else
-		{
-		GuiControl, , MissIT, %vMisses% miss
-		}
+		vMisses := (vMisses + 1)	
+		if vMisses < 9999
+			vMisses_post = %vMisses%
+		if (vMisses >9999) and (vMisses <1000000)
+			vMisses_post = %vMisses%K
+		else if (vMisses >999999) and (vMisses <1000000000)
+			vMisses_post = %vMisses%M
+		else if (vMisses >999999) and (vMisses <1000000000)
+			vMisses_post = %vMisses%B
+		GuiControl, , GuiMiss, %vMisses_post% Missed
 	}
-	;	;	;	;	;	RESET vLINES FOR NEXT COMBONATION OF ARMORS, LOOPS BACK.
-	vLine1 = 0
-	vLine2 = 0
-	vLine3 = 0
-	vLine4 = 0
+	
 }
 return
-
-
-;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;
-;	;	;	;	;	;	;	OPEN FILE	;	;	;	;	;	;	;	;
-;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;
 
 s2:
 Run, %A_WorkingDir%\data\draft.txt
 return
 
-
-;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;
-;	;	;	;	;	;	;	CLOSE PROGRAM;	;	;	;	;	;	;	;
-;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;	;
-
 GuiClose:
-FileDelete, data/backup.txt
-FileAppend, %vSet%`n%vAll%, data/backup.txt
+FileAppend, %v_binary_string%`n%v_percent_gui%, data/backup.txt
 ExitApp
 return
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
